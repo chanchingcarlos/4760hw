@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEEM4760 功課一 · 互動解題網站</title>
+<style>
+:root{--bg:#0f172a;--card:#ffffff;--accent:#1d4ed8;--accent2:#0ea5e9;--muted:#64748b;--line:#e2e8f0;--ok:#059669;--warn:#d97706}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans TC","PingFang HK","Microsoft JhengHei",system-ui,sans-serif;background:#f1f5f9;color:#0f172a;line-height:1.75}
+header{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:18px 20px;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+header h1{margin:0;font-size:20px;letter-spacing:.5px}
+header p{margin:4px 0 0;font-size:13px;opacity:.85}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+nav button{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:7px 14px;cursor:pointer;font-size:13px}
+nav button.active,nav button:hover{background:#fff;color:#0f172a}
+main{max-width:1080px;margin:0 auto;padding:22px 16px 80px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin:18px 0;box-shadow:0 6px 24px rgba(15,23,42,.06)}
+.card h2{margin:0 0 6px;color:var(--accent);font-size:20px}
+.badge{display:inline-block;font-size:12px;background:#dbeafe;color:#1e40af;border-radius:999px;padding:2px 10px;margin-left:8px;vertical-align:middle}
+.ans{background:#ecfdf5;border:1px solid #6ee7b7;border-radius:12px;padding:12px 14px;margin:12px 0}
+.ans b{color:#065f46}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+table.m{border-collapse:collapse;width:100%;font-size:13px;margin:10px 0}
+table.m th,table.m td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.m th{background:#1e3a8a;color:#fff}
+table.m td.rh{background:#1e3a8a;color:#fff;font-weight:700}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.controls label{font-size:13px;color:#334155}
+select,input[type=number],input[type=range]{padding:6px 8px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+button.btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;cursor:pointer;font-size:14px}
+button.btn.ghost{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+button.btn:hover{opacity:.9}
+canvas.plot{width:100%;height:220px;border:1px solid var(--line);border-radius:12px;background:#f8fafc}
+.bar{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px}
+.bar .lbl{width:70px;text-align:right;color:#334155;white-space:nowrap}
+.bar .track{flex:1;background:#e2e8f0;border-radius:999px;height:14px;overflow:hidden}
+.bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px;transition:width .5s}
+.bar .val{width:90px;font-variant-numeric:tabular-nums}
+code.k{background:#f1f5f9;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
+.step{background:#f8fafc;border-left:4px solid var(--accent);padding:10px 12px;border-radius:0 10px 10px 0;margin:10px 0}
+.small{font-size:13px;color:var(--muted)}
+svg.diagram{width:100%;height:auto;max-height:340px;background:#f8fafc;border:1px solid var(--line);border-radius:12px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
+.hidden{display:none!important}
+.toc{display:flex;gap:8px;flex-wrap:wrap}
+.kbd{font-size:12px;color:#475569}
+hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
+</style>
+</head>
+<body>
+<header>
+<h1>SEEM4760 / ESTR4512 · Homework Set 1 互動解題</h1>
+<p>繁體中文逐步解釋 ＋ 可動手玩嘅 Markov Chain 實驗 · 答案以英文 PDF 為準，本網站只作理解用途</p>
+<nav id="topnav">
+<button data-q="q1" class="active">Q1 轉移概率</button>
+<button data-q="q2">Q2 信貸評級</button>
+<button data-q="q3">Q3 賭徒破產</button>
+<button data-q="q4">Q4 (s,S) 存貨</button>
+<button data-q="q5">Q5 PageRank</button>
+<button data-q="q6">Q6 圖上隨機漫步</button>
+</nav>
+</header>
+<main>
+
+<!-- ============ Q1 ============ -->
+<section class="card" id="q1">
+<h2>Q1 · 轉移概率計算 <span class="badge">Chapman–Kolmogorov</span></h2>
+<p>狀態空間 <code class="k">S = {1,2,3}</code>。由 Lecture Notes 2 第 16 頁轉移圖讀出一步轉移矩陣：</p>
+<table class="m"><tr><th></th><th>→ 1</th><th>→ 2</th><th>→ 3</th></tr>
+<tr><td class="rh">1</td><td>0.4</td><td>0.5</td><td>0.1</td></tr>
+<tr><td class="rh">2</td><td>0.3</td><td>0.3</td><td>0.4</td></tr>
+<tr><td class="rh">3</td><td>0.3</td><td>0.2</td><td>0.5</td></tr></table>
+<svg class="diagram" viewBox="0 0 560 260" id="q1svg">
+<!-- nodes -->
+<g font-size="15" text-anchor="middle">
+<ellipse cx="140" cy="130" rx="34" ry="28" fill="#fff" stroke="#1e3a8a" stroke-width="2"/><text x="140" y="136">1</text>
+<ellipse cx="420" cy="130" rx="34" ry="28" fill="#fff" stroke="#1e3a8a" stroke-width="2"/><text x="420" y="136">2</text>
+<ellipse cx="280" cy="220" rx="34" ry="28" fill="#fff" stroke="#1e3a8a" stroke-width="2"/><text x="280" y="226">3</text>
+</g>
+<g font-size="13" fill="#0f172a">
+<!-- 1->1 loop -->
+<path d="M110,115 Q60,90 108,108" fill="none" stroke="#334155" marker-end="url(#a1)"/><text x="55" y="110">0.4</text>
+<path d="M174,112 Q280,60 386,112" fill="none" stroke="#334155" marker-end="url(#a1)"/><text x="275" y="80">0.5</text>
+<path d="M386,148 Q280,180 174,148" fill="none" stroke="#334155" marker-end="url(#a1)"/><text x="275" y="168">0.3</text>
+<path d="M452,115 Q500,90 452,108" fill="none" stroke="#334155" marker-end="url(#a1)"/><text x="492" y="110">0.3</text>
+<path d="M400,155 Q360,190 300,205" fill="none" stroke="#334155" marker-end="url(#a1)"/><text x="392" y="190">0.4</text>
+<path d="M260,195 Q230,170 160,150" fill="none" stroke="#334155" marker-end="url(#a1)"/><text x="205" y="195">0.1</text>
+<path d="M250,205 Q230,180 155,145" fill="none" stroke="#0ea5e9" marker-end="url(#a1)" stroke-dasharray="4 3"/><text x="170" y="200" fill="#0ea5e9">0.3</text>
+<path d="M300,195 Q330,170 400,150" fill="none" stroke="#0ea5e9" marker-end="url(#a1)" stroke-dasharray="4 3"/><text x="345" y="185" fill="#0ea5e9">0.2</text>
+<path d="M300,248 Q280,265 260,248" fill="none" stroke="#334155" marker-end="url(#a1)"/><text x="330" y="255">0.5</text>
+</g>
+<defs><marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#333" stroke-width="1.2"/></marker></defs>
+</svg>
+<p class="small">實線黑色：1↔2 及自圈；藍色虛線：3→1 (0.3)、3→2 (0.2)；留意每行和 = 1。</p>
+
+<div class="step"><b>(a) 概念：</b>兩步概率 <code class="k">P(X₂=2|X₀=1) = (P²)₁₂ = Σₖ p₁ₖ·pₖ₂</code>。即係「第一步去邊＋第二步去 2」所有中間路徑加總（全概率＋Markov 性）。</div>
+<div class="ans">答案：<b>P(X₂=2|X₀=1) = 0.4×0.5 + 0.5×0.3 + 0.1×0.2 = 0.37</b></div>
+<div class="step"><b>(b) 概念：</b>聯合概率 = 初始分布 × 連乘一步轉移：<code class="k">P(X₀=2)·p₂₃·p₃₁·p₁₂ = 0.5×0.4×0.3×0.5 = 0.03</code>。</div>
+<div class="ans">答案：<b>0.03</b></div>
+
+<h3>互動：兩步轉移計算機</h3>
+<div class="controls">
+<label>起點 X₀ <select id="q1s"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></label>
+<label>終點 X₂ <select id="q1t"><option value="0">1</option><option value="1" selected>2</option><option value="2">3</option></select></label>
+<button class="btn" onclick="q1calc()">計算 P²</button>
+<span id="q1out" class="kbd"></span>
+</div>
+<div id="q1paths"></div>
+<script>
+const P1=[[0.4,0.5,0.1],[0.3,0.3,0.4],[0.3,0.2,0.5]];
+function q1calc(){
+ const s=+document.getElementById('q1s').value, t=+document.getElementById('q1t').value;
+ let html='', tot=0;
+ for(let k=0;k<3;k++){const v=P1[s][k]*P1[k][t];tot+=v;
+  html+=`<div class="bar"><div class="lbl">經 ${k+1}</div><div class="track"><div class="fill" style="width:${(v*100).toFixed(1)}%"></div></div><div class="val">${P1[s][k]}×${P1[k][t]}=${v.toFixed(4)}</div></div>`;}
+ document.getElementById('q1paths').innerHTML=html+`<p><b>總和 = ${tot.toFixed(4)}</b>（即 P² 的第 ${s+1} 行第 ${t+1} 列）</p>`;
+ document.getElementById('q1out').textContent=`P(X2=${t+1}|X0=${s+1})=${tot.toFixed(4)}`;
+}
+q1calc();
+</script>
+
+<h3>互動：聯合概率路徑</h3>
+<div class="controls">
+<label>路徑 <select id="q1p"><option>2→3→1→2</option><option>1→2→3→1</option><option>1→1→1→1</option></select></label>
+<label> P(X₀) <input id="q1p0" type="number" value="0.5" step="0.1" min="0" max="1" style="width:70px"></label>
+<button class="btn" onclick="q1path()">計算</button><span id="q1pout"></span>
+</div>
+<script>
+function q1path(){
+ const s=document.getElementById('q1p').value.split('→').map(Number);
+ const p0=parseFloat(document.getElementById('q1p0').value);
+ let prod=p0, txt=`${p0}`;
+ for(let i=0;i<3;i++){const p=P1[s[i]-1][s[i+1]-1];prod*=p;txt+=` × ${p}`;}
+ document.getElementById('q1pout').innerHTML=`<b>${prod.toFixed(5)}</b> <span class="small">(${txt})</span>`;
+}
+q1path();
+</script>
+</section>
+
+<!-- ============ Q2 ============ -->
+<section class="card" id="q2">
+<h2>Q2 · 信貸評級轉移矩陣 <span class="badge">條件化＋多步</span></h2>
+<div class="step"><b>(a) 點解要 re-normalize？</b>原表每行有 NR（撤回評級）一欄。我哋只關心「繼續有評級」嘅公司，所以要 condition on 唔係 NR：將 NR 欄刪除，再將每行除以（100 − NR）。數學上即 <code class="k">p̃ᵢⱼ = pᵢⱼ / (1 − pᵢ,NR)</code>。例如 AAA 行：分母 = 100−3.08 = 96.92，AAA→AAA = 87.28/96.92 = 0.900537。</div>
+<div class="controls"><button class="btn" onclick="document.getElementById('q2tab').classList.toggle('hidden')">顯示／隱藏 (a) 重整後矩陣</button>
+<button class="btn ghost" onclick="q2demo()">逐步示範 AAA 行</button><span id="q2demoout" class="kbd"></span></div>
+<div id="q2tab">
+<table class="m" style="font-size:11px"><tr><th>From\To</th><th>AAA</th><th>AA</th><th>A</th><th>BBB</th><th>BB</th><th>B</th><th>CCC/C</th><th>D</th></tr>
+<tr><td class="rh">AAA</td><td>0.900537</td><td>0.092035</td><td>0.005262</td><td>0.000310</td><td>0.001032</td><td>0.000310</td><td>0.000516</td><td>0.000000</td></tr>
+<tr><td class="rh">AA</td><td>0.004674</td><td>0.911300</td><td>0.077898</td><td>0.004570</td><td>0.000519</td><td>0.000623</td><td>0.000208</td><td>0.000208</td></tr>
+<tr><td class="rh">A</td><td>0.000208</td><td>0.015425</td><td>0.931944</td><td>0.048359</td><td>0.002397</td><td>0.001042</td><td>0.000104</td><td>0.000521</td></tr>
+<tr><td class="rh">BBB</td><td>0.000000</td><td>0.000742</td><td>0.032347</td><td>0.926185</td><td>0.034044</td><td>0.004242</td><td>0.000955</td><td>0.001485</td></tr>
+<tr><td class="rh">BB</td><td>0.000110</td><td>0.000220</td><td>0.001102</td><td>0.048915</td><td>0.869120</td><td>0.068855</td><td>0.005508</td><td>0.006169</td></tr>
+<tr><td class="rh">B</td><td>0.000000</td><td>0.000228</td><td>0.000685</td><td>0.001598</td><td>0.051033</td><td>0.858317</td><td>0.054687</td><td>0.033451</td></tr>
+<tr><td class="rh">CCC/C</td><td>0.000000</td><td>0.000000</td><td>0.000824</td><td>0.001530</td><td>0.004708</td><td>0.155114</td><td>0.530423</td><td>0.307403</td></tr>
+</table>
+<p class="small">D 視為吸收態（p<sub>D,D</sub>=1），先可以計「兩年內違約」。</p>
+</div>
+<script>function q2demo(){document.getElementById('q2demoout').textContent='87.28 / (100 − 3.08) = 87.28/96.92 = 0.900537；8.92/96.92=0.092035；如此類推，每行和=1';}</script>
+
+<div class="step"><b>(b) BB 兩年內違約：</b>違約係吸收態，所以「兩年內違約」= 第一年已違約 ＋ 第一年去咗第個評級、第二年再違約。用 Chapman–Kolmogorov：<code class="k">P = p(BB→D) + Σₖ p(BB→k)·p(k→D) = (P²)_{BB,D}</code>。最大貢獻係直接違約 (0.006169) 同經 BB→BB→D (0.005362)、BB→B→D (0.002303) 等，總和 <b>0.015601（1.5601%）</b>。</div>
+<div class="ans">答案 (b)：<b>0.015601 ≈ 1.5601%</b></div>
+<div id="q2b"></div>
+<script>
+const P2f=[[0.900537,0.092035,0.005262,0.000310,0.001032,0.000310,0.000516,0],[0.004674,0.911300,0.077898,0.004570,0.000519,0.000623,0.000208,0.000208],[0.000208,0.015425,0.931944,0.048359,0.002397,0.001042,0.000104,0.000521],[0,0.000742,0.032347,0.926185,0.034044,0.004242,0.000955,0.001485],[0.000110,0.000220,0.001102,0.048915,0.869120,0.068855,0.005508,0.006169],[0,0.000228,0.000685,0.001598,0.051033,0.858317,0.054687,0.033451],[0,0,0.000824,0.001530,0.004708,0.155114,0.530423,0.307403],[0,0,0,0,0,0,0,1]];
+const L2=["AAA","AA","A","BBB","BB","B","CCC/C","D"];
+(function(){let h='<p><b>BB 出發，經各中間評級再違約嘅貢獻：</b></p>';const bb=4;
+for(let k=0;k<8;k++){const v=P2f[bb][k]*P2f[k][7];const w=Math.min(100,v/0.016*100);
+h+=`<div class="bar"><div class="lbl">${L2[k]}</div><div class="track"><div class="fill" style="width:${w.toFixed(1)}%"></div></div><div class="val">${v.toFixed(6)}</div></div>`;}
+h+=`<p class="small">加總 = 0.015601（含第一年直接違約 0.006169）</p>`;document.getElementById('q2b').innerHTML=h;})();
+</script>
+
+<div class="step"><b>(c) AAA 三年後仍 AA 或以上：</b>計三步轉移 <code class="k">(P³)_{AAA,AAA} + (P³)_{AAA,AA} = 0.73148 + 0.22697 ≈ 0.95845</code>。因為由 AAA 跌落 A 以下再三年內升返 AA 嘅概率極細，所以「三年後係 AA+」同「三年一直留喺 AA+」幾乎一樣（後者 0.95811，只差 0.0003）。</div>
+<div class="ans">答案 (c)：<b>0.958450 ≈ 95.8450%</b></div>
+<div class="controls"><button class="btn" onclick="q2c()">顯示 AAA 三步分布</button></div><div id="q2cout"></div>
+<script>
+function matMul(A,B){const n=A.length,m=B[0].length,k=B.length;const C=Array.from({length:n},()=>Array(m).fill(0));for(let i=0;i<n;i++)for(let j=0;j<m;j++)for(let t=0;t<k;t++)C[i][j]+=A[i][t]*B[t][j];return C;}
+function q2c(){const P3=matMul(matMul(P2f,P2f),P2f);let h='<p><b>由 AAA 出發三年後分布：</b></p>';
+for(let j=0;j<8;j++){h+=`<div class="bar"><div class="lbl">${L2[j]}</div><div class="track"><div class="fill" style="width:${(P3[0][j]*100).toFixed(1)}%"></div></div><div class="val">${(P3[0][j]*100).toFixed(2)}%</div></div>`;}
+h+=`<p>AAA+AA = ${(P3[0][0]+P3[0][1]).toFixed(6)} ≈ 95.845%</p>`;document.getElementById('q2cout').innerHTML=h;}
+</script>
+</section>
+
+<!-- ============ Q3 ============ -->
+<section class="card" id="q3">
+<h2>Q3 · 賭徒破產 <span class="badge">吸收態＋不可約</span></h2>
+<div class="step"><b>(a) 點解係 Markov？</b>設 Xₙ 為第 n 局後嘅資金。下一局獨立於過去：贏就 +1（概率 p），輸就 −1（概率 1−p）。所以 <code class="k">P(Xₙ₊₁ | X₀…Xₙ) = P(Xₙ₊₁ | Xₙ)</code>，只依賴而家嘅資金，符合 Markov 性。狀態空間 <code class="k">{0,1,…,N}</code>，0 同 N 係吸收態（停玩）。</div>
+<div class="ans">轉移矩陣：<b>p₀₀=1，p<sub>N,N</sub>=1；0&lt;i&lt;N 時 p<sub>i,i+1</sub>=p，p<sub>i,i−1</sub>=1−p，其餘 0。</b></div>
+<div class="step"><b>(b) Irreducible？否。</b> 0 同 N 出唔返嚟：由 1 可以去 0，但由 0 去唔到 1，所以 0 同 1 唔互通 → 多過一個互通類。</div>
+<div class="ans">(b) <b>否（No）。0、N 吸收，唔同其他狀態互通。</b></div>
+<div class="step"><b>(c) 平穩分布？</b>有限狀態鏈必存在平穩分布；但因為唔 irreducible，唔唯一。例如 δ₀（永遠停喺 0）同 δ<sub>N</sub> 都係平穩，佢哋嘅凸組合都係。</div>
+<div class="ans">(c) <b>存在，但不唯一（Exists but not unique）。</b></div>
+<h3>互動：賭徒破產模擬</h3>
+<div class="controls">
+<label>p <input id="q3p" type="range" min="0.05" max="0.95" step="0.05" value="0.5" oninput="document.getElementById('q3pv').textContent=this.value"> <span id="q3pv">0.5</span></label>
+<label>N <input id="q3N" type="number" value="10" min="3" max="30" style="width:60px"></label>
+<label>起點 <input id="q3x" type="number" value="5" min="1" max="29" style="width:60px"></label>
+<button class="btn" onclick="q3sim()">跑 20 條路徑</button>
+</div>
+<canvas class="plot" id="q3cv" width="900" height="220"></canvas>
+<p class="small" id="q3stat"></p>
+<script>
+function q3sim(){
+ const p=parseFloat(document.getElementById('q3p').value),N=parseInt(document.getElementById('q3N').value),x0=parseInt(document.getElementById('q3x').value);
+ const cv=document.getElementById('q3cv'),ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+ let hit0=0,hitN=0;
+ const X=x=>40+x*(cv.width-80)/60, Y=v=>cv.height-20-v*(cv.height-50)/N;
+ ctx.strokeStyle='#cbd5e1';ctx.beginPath();ctx.moveTo(0,Y(0));ctx.lineTo(cv.width,Y(0));ctx.moveTo(0,Y(N));ctx.lineTo(cv.width,Y(N));ctx.stroke();
+ ctx.fillStyle='#64748b';ctx.fillText('0 (破產)',4,Y(0)-4);ctx.fillText('N (收手)',4,Y(N)-4);
+ for(let r=0;r<20;r++){let x=x0;ctx.strokeStyle=`hsl(${200+r*6},70%,45%)`;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(X(0),Y(x));
+  for(let t=1;t<=60;t++){if(x===0||x===N){ctx.lineTo(X(t),Y(x));continue;}x+=(Math.random()<p?1:-1);ctx.lineTo(X(t),Y(x));if(x===0||x===N){for(let u=t+1;u<=60;u++)ctx.lineTo(X(u),Y(x));break;}}
+  ctx.stroke();if(x===0)hit0++;else if(x===N)hitN++;}
+ document.getElementById('q3stat').textContent=`20 次模擬：${hit0} 次破產(0)，${hitN} 次達到 N，其餘未吸收。留意一旦掂到 0/N 就永遠停留——所以唔 irreducible。`;
+}
+q3sim();
+</script>
+</section>
+
+<!-- ============ Q4 ============ -->
+<section class="card" id="q4">
+<h2>Q4 · (s,S) 訂貨政策 <span class="badge">存貨 Markov 鏈</span></h2>
+<div class="step"><b>直觀：</b>Xₙ 係第 n 期<i>期末</i>存貨。 bekannten 期初存貨 Xₙ₋₁ 後，補貨規則係確定性函數：<code class="k">Yₙ = Xₙ₋₁（若 ≥s），Yₙ = S（若 &lt;s）</code>；再減去當期獨立需求 Dₙ（缺貨即棄：<code class="k">Xₙ = max(Yₙ−Dₙ, 0)</code>）。因為 Dₙ i.i.d. 且獨立於歷史，Xₙ 在已知 Xₙ₋₁ 下嘅分布唔再依賴更早歷史 → Markov。狀態空間 <code class="k">{0,…,S}</code>。</div>
+<div class="ans">轉移概率（α<sub>k</sub>=P(D=k)）：<br><b>i ≥ s：</b>p<sub>i,j</sub>=α<sub>i−j</sub>（1≤j≤i），p<sub>i,0</sub>=Σ<sub>k≥i</sub>α<sub>k</sub>，j&gt;i 時 0。<br><b>i &lt; s：</b>p<sub>i,j</sub>=α<sub>S−j</sub>（1≤j≤S），p<sub>i,0</sub>=Σ<sub>k≥S</sub>α<sub>k</sub>（與 i 無關）。</div>
+<h3>互動：(s,S) 存貨模擬</h3>
+<div class="controls">
+<label>s <input id="q4s" type="number" value="3" min="1" max="9" style="width:55px"></label>
+<label>S <input id="q4S" type="number" value="8" min="2" max="12" style="width:55px"></label>
+<label>平均需求 λ <input id="q4l" type="range" min="1" max="8" step="0.5" value="3" oninput="document.getElementById('q4lv').textContent=this.value"><span id="q4lv">3</span></label>
+<button class="btn" onclick="q4sim()">模擬 60 期</button>
+</div>
+<canvas class="plot" id="q4cv" width="900" height="220"></canvas>
+<p class="small" id="q4stat"></p>
+<script>
+function pois(l){let L=Math.exp(-l),k=0,p=1;do{k++;p*=Math.random();}while(p>L);return k-1;}
+function q4sim(){
+ let s=parseInt(document.getElementById('q4s').value),S=parseInt(document.getElementById('q4S').value);if(s>=S){document.getElementById('q4stat').textContent='請設 s < S';return;}
+ const lam=parseFloat(document.getElementById('q4l').value);
+ const cv=document.getElementById('q4cv'),ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+ let x=S;const X=t=>30+t*(cv.width-50)/60, Y=v=>cv.height-25-v*(cv.height-60)/(S+1);
+ ctx.strokeStyle='#f59e0b';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(0,Y(s));ctx.lineTo(cv.width,Y(s));ctx.stroke();ctx.setLineDash([]);
+ ctx.fillStyle='#92400e';ctx.fillText('s='+s,4,Y(s)-4);
+ ctx.strokeStyle='#1d4ed8';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(X(0),Y(x));
+ let orders=0;
+ for(let t=1;t<=60;t++){const y=(x<s)?S:x;if(x<s)orders++;const d=pois(lam);x=Math.max(y-d,0);ctx.lineTo(X(t),Y(x));}
+ ctx.stroke();
+ document.getElementById('q4stat').textContent=`60 期內補貨 ${orders} 次（凡上期末 < s 即下期初補到 S）。注意：i<s 嘅行轉移概率完全一樣——因為都係由 S 出發扣需求。`;
+}
+q4sim();
+</script>
+<div class="step"><b>轉移矩陣形狀：</b>頭 s 行（i=0…s−1）完全相同；下面嘅行每行係 α 向量嘅平移＋尾部加總到 0。試下改 s、S，會見到「補貨線」點樣將低存貨拉返上 S。</div>
+</section>
+
+<!-- ============ Q5 ============ -->
+<section class="card" id="q5">
+<h2>Q5 · PageRank <span class="badge">阻尼＋平穩</span></h2>
+<div class="step"><b>讀圖：</b>5 個網頁嘅連結（out-degree）：1→{3,5}，2→{1,3}，3→{2,4}，4→{1,5}，5→{3}。所以 deg = (2,2,2,2,1)。<br><b>轉移公式：</b>以 0.8 概率均勻撳出連結之一，以 0.2 概率均勻跳去任意頁（0.2/5=0.04）：<code class="k">Pᵢⱼ = 0.8/outdeg(i)（若有連結）+ 0.04，否則 0.04</code>。例如第 1 行：去 3、5 各 0.4+0.04=0.44，其餘 0.04；第 5 行：去 3 係 0.8+0.04=0.84。</div>
+<table class="m"><tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+<tr><td class="rh">1</td><td>0.04</td><td>0.04</td><td>0.44</td><td>0.04</td><td>0.44</td></tr>
+<tr><td class="rh">2</td><td>0.44</td><td>0.04</td><td>0.44</td><td>0.04</td><td>0.04</td></tr>
+<tr><td class="rh">3</td><td>0.04</td><td>0.44</td><td>0.04</td><td>0.44</td><td>0.04</td></tr>
+<tr><td class="rh">4</td><td>0.44</td><td>0.04</td><td>0.04</td><td>0.04</td><td>0.44</td></tr>
+<tr><td class="rh">5</td><td>0.04</td><td>0.04</td><td>0.84</td><td>0.04</td><td>0.04</td></tr></table>
+<div class="ans">平穩分布 <b>π ≈ (0.173422, 0.166777, 0.316944, 0.166777, 0.176080)</b>。第 3 頁最高（因為 1、2、5 都指住佢）。注意 2 同 4 對稱所以概率相等。</div>
+<svg class="diagram" viewBox="0 0 560 320">
+<g text-anchor="middle" font-size="16">
+<ellipse cx="280" cy="50" rx="30" ry="26" fill="#fff" stroke="#1e3a8a" stroke-width="2"/><text x="280" y="56">1</text>
+<ellipse cx="120" cy="150" rx="30" ry="26" fill="#fff" stroke="#1e3a8a" stroke-width="2"/><text x="120" y="156">2</text>
+<ellipse cx="440" cy="150" rx="30" ry="26" fill="#fff" stroke="#1e3a8a" stroke-width="2"/><text x="440" y="156">3</text>
+<ellipse cx="180" cy="270" rx="30" ry="26" fill="#fff" stroke="#1e3a8a" stroke-width="2"/><text x="180" y="276">4</text>
+<ellipse cx="380" cy="270" rx="30" ry="26" fill="#fff" stroke="#1e3a8a" stroke-width="2"/><text x="380" y="276">5</text>
+</g>
+<g stroke="#334155" fill="none" stroke-width="1.6" marker-end="url(#a2)" font-size="12">
+<path d="M305,65 L410,130"/><path d="M295,75 L360,240"/>
+<path d="M140,130 L250,65"/><path d="M150,160 L400,155"/>
+<path d="M410,155 L155,145"/><path d="M420,175 L210,255"/>
+<path d="M200,245 L265,75"/><path d="M210,265 L350,268"/>
+<path d="M375,245 L430,175"/>
+</g>
+<defs><marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#333" stroke-width="1.2"/></marker></defs>
+</svg>
+<h3>互動：Power iteration 收斂</h3>
+<div class="controls"><button class="btn" onclick="q5run()">由均勻分布開始迭代 15 步</button><button class="btn ghost" onclick="q5reset()">重設</button></div>
+<div id="q5bars"></div>
+<p class="small">每步 π<sub>t+1</sub>ᵀ = π<sub>t</sub>ᵀP。因為所有元素 &gt;0（有 teleport），條鏈 irreducible＋aperiodic，必收斂到唯一平穩分布。</p>
+<script>
+const P5=[[0.04,0.04,0.44,0.04,0.44],[0.44,0.04,0.44,0.04,0.04],[0.04,0.44,0.04,0.44,0.04],[0.44,0.04,0.04,0.04,0.44],[0.04,0.04,0.84,0.04,0.04]];
+let pi5=[0.2,0.2,0.2,0.2,0.2],timer5=null;
+function draw5(){let h='';for(let i=0;i<5;i++){h+=`<div class="bar"><div class="lbl">頁 ${i+1}</div><div class="track"><div class="fill" style="width:${(pi5[i]*100/0.35).toFixed(1)}%"></div></div><div class="val">${pi5[i].toFixed(5)}</div></div>`;}document.getElementById('q5bars').innerHTML=h;}
+function q5run(){if(timer5)clearInterval(timer5);let s=0;timer5=setInterval(()=>{const n=[0,0,0,0,0];for(let i=0;i<5;i++)for(let j=0;j<5;j++)n[j]+=pi5[i]*P5[i][j];pi5=n;draw5();if(++s>=15)clearInterval(timer5);},350);}
+function q5reset(){if(timer5)clearInterval(timer5);pi5=[0.2,0.2,0.2,0.2,0.2];draw5();}
+draw5();
+</script>
+</section>
+
+<!-- ============ Q6 ============ -->
+<section class="card" id="q6">
+<h2>Q6 · 無向加權圖上隨機漫步 <span class="badge">Detailed Balance</span></h2>
+<div class="step"><b>Irreducible 點嚟？</b>圖連通 ⇒ 任兩點 x,y 之間有條路 x=v₀→v₁→…→vₙ=y，每步都係鄰居所以一步概率 &gt;0（權重係正數），成條路概率 = 連乘 &gt;0，所以 y 由 x 可達；無向圖反向亦然 ⇒ 任意兩態互通 ⇒ irreducible（得一個互通類）。</div>
+<div class="step"><b>平穩分布點估？</b>直覺：長期停留喺某點嘅時間正比於「加權度」<code class="k">w(x)=Σ_{z∈N(x)} w({x,z})</code>。設 <code class="k">W=Σₓ w(x)</code>，<code class="k">πₓ = w(x)/W</code>。驗證 detailed balance：<code class="k">πₓpₓᵧ = w(x)/W · w({x,y})/w(x) = w({x,y})/W = πᵧpᵧₓ</code>，兩邊對 x 求和即得 πᵀ=πᵀP。若 V 有限，W 有限，π 係合法分布；若無限，就係不變測度。</div>
+<div class="ans">答案：<b>Irreducible（Yes）。π<sub>x</sub> = w(x)/W，其中 w(x)=Σ<sub>z∈N(x)</sub>w({x,z})，W=Σ<sub>v</sub>w(v)。</b></div>
+<h3>互動：加權度 ∝ 平穩概率</h3>
+<div class="controls">
+<label>w12 <input id="w12" type="range" min="1" max="9" value="2" oninput="q6up()"></label>
+<label>w23 <input id="w23" type="range" min="1" max="9" value="5" oninput="q6up()"></label>
+<label>w31 <input id="w31" type="range" min="1" max="9" value="1" oninput="q6up()"></label>
+</div>
+<div id="q6out"></div>
+<script>
+function q6up(){
+ const a=+document.getElementById('w12').value,b=+document.getElementById('w23').value,c=+document.getElementById('w31').value;
+ const w1=a+c,w2=a+b,w3=b+c,W=w1+w2+w3;
+ const pi=[w1/W,w2/W,w3/W];
+ let h='<p><b>三角形圖 1−2−3，邊權分別 '+a+', '+b+', '+c+'：</b></p>';
+ for(let i=0;i<3;i++){h+=`<div class="bar"><div class="lbl">節點 ${i+1} (度 ${[w1,w2,w3][i]})</div><div class="track"><div class="fill" style="width:${(pi[i]*100).toFixed(1)}%"></div></div><div class="val">${pi[i].toFixed(4)}</div></div>`;}
+ // verify pi P = pi
+ const P=[[0,a/(a+c),c/(a+c)],[a/(a+b),0,b/(a+b)],[c/(b+c),b/(b+c),0]];
+ const q=[0,0,0];for(let i=0;i<3;i++)for(let j=0;j<3;j++)q[j]+=pi[i]*P[i][j];
+ h+=`<p class="small">驗證 πP = (${q.map(v=>v.toFixed(4)).join(', ')}) ≈ π，detailed balance 成立：π₁p₁₂=${(pi[0]*P[0][1]).toFixed(4)} = π₂p₂₁=${(pi[1]*P[1][0]).toFixed(4)} 等。</p>`;
+ document.getElementById('q6out').innerHTML=h;
+}
+q6up();
+</script>
+<hr class="sep">
+<p class="small">學習提示：Q1–Q2 練 Chapman–Kolmogorov（矩陣乘法）；Q3–Q4 練「點樣判斷 Markov＋寫轉移」；Q5–Q6 練「平穩分布」——有限 irreducible 必存在，aperiodic 先保證收斂；無向圖有 detailed balance 好易估 π。</p>
+</section>
+
+</main>
+<footer>SEEM4760 Homework 1 · 互動解題網站（繁體中文）· 數值已用程式覆核（P²、P³、冪迭代）</footer>
+<script>
+document.querySelectorAll('#topnav button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('#topnav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+ document.getElementById(b.dataset.q).scrollIntoView({behavior:'smooth'});
+}));
+</script>
+</body>
+</html>
