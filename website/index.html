@@ -49,12 +49,27 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
 .toc{display:flex;gap:8px;flex-wrap:wrap}
 .kbd{font-size:12px;color:#475569}
 hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
+.tut-btn{margin:8px 0}
+.tutorial{background:#fffbeb;border:1px solid #fcd34d;border-radius:12px;padding:16px;margin:14px 0}
+.tutorial h4{margin:14px 0 6px;color:#92400e}
+.tutorial table.vocab{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0}
+.tutorial table.vocab th,.tutorial table.vocab td{border:1px solid #fcd34d;padding:5px 8px;text-align:left}
+.tutorial table.vocab th{background:#fef3c7}
+.modal{position:fixed;inset:0;z-index:200;display:none;background:rgba(15,23,42,.65);padding:18px}
+.modal.open{display:block}
+.modal-box{background:#fff;max-width:900px;margin:2vh auto;max-height:94vh;overflow:auto;border-radius:16px;padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.modal-bar{position:sticky;top:-26px;background:#fff;padding:10px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.modal-body{padding-top:8px}
+details.quiz{border:1px dashed var(--accent);border-radius:10px;padding:8px 12px;margin:8px 0;background:#eff6ff}
+details.quiz summary{cursor:pointer;font-weight:700;color:var(--accent)}
+.cite{font-size:12px;color:#64748b;background:#f1f5f9;border-radius:8px;padding:6px 10px;margin:6px 0}
+
 </style>
 </head>
 <body>
 <header>
 <h1>SEEM4760 / ESTR4512 · Homework Set 1 互動解題</h1>
-<p>繁體中文逐步解釋 ＋ 可動手玩嘅 Markov Chain 實驗 · 答案以英文 PDF 為準，本網站只作理解用途</p>
+<p>繁體中文逐步解釋 ＋ 可動手玩嘅 Markov Chain 實驗 · 答案以英文 PDF 為準，本網站只作理解用途（每題有「由零開始學」放大教學）</p>
 <nav id="topnav">
 <button data-q="pdf" class="active">答案 PDF</button>
 <button data-q="q1">Q1 轉移概率</button>
@@ -116,6 +131,37 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
 <div class="step"><b>(b) 概念：</b>聯合概率 = 初始分布 × 連乘一步轉移：<code class="k">P(X₀=2)·p₂₃·p₃₁·p₁₂ = 0.5×0.4×0.3×0.5 = 0.03</code>。</div>
 <div class="ans">答案：<b>0.03</b></div>
 
+<div class="controls tut-btn"><button class="btn" onclick="openTut('q1')">📖 由零開始學：放大＋詳細教學（Q1）</button></div>
+<template id="tut-q1">
+<div class="tutorial">
+<p><b>適合對象：</b>假設你完全未學過 Markov chain（馬可夫鏈）。讀完你會識：咩係狀態、轉移圖點睇、兩步概率點解要加總、聯合概率點解要連乘。</p>
+<h4>0 · 中英詞彙（先識字）</h4>
+<table class="vocab"><tr><th>中文</th><th>English</th><th>一句話</th></tr>
+<tr><td>隨機過程</td><td>stochastic process</td><td>隨時間排列的一串隨機變數 {X<sub>t</sub>}（Lecture Notes 2, p.2–3）</td></tr>
+<tr><td>狀態／狀態空間</td><td>state / state space S</td><td>X<sub>t</sub> 的取值；本題 S={1,2,3}</td></tr>
+<tr><td>馬可夫性質（無記憶性）</td><td>Markov property</td><td>P(X<sub>t+1</sub>|全部歷史) = P(X<sub>t+1</sub>|X<sub>t</sub>)（LN2, p.4–5）</td></tr>
+<tr><td>時間齊次</td><td>time-homogeneous</td><td>轉移規律唔隨 t 變（LN2, p.13–14）</td></tr>
+<tr><td>一步／兩步轉移概率</td><td>one-step / s-step transition probability p<sub>i,j</sub> / p<sup>(s)</sup><sub>i,j</sub></td><td>p<sub>i,j</sub>=P(X<sub>t+1</sub>=j|X<sub>t</sub>=i)（LN2, p.15）</td></tr>
+<tr><td>Chapman–Kolmogorov 方程</td><td>Chapman–Kolmogorov equations</td><td>P<sup>(r+s)</sup>=P<sup>(r)</sup>P<sup>(s)</sup>，即中間加總（LN2, p.17–18）</td></tr>
+<tr><td>轉移圖／轉移矩陣</td><td>transition diagram / matrix P</td><td>箭頭數字 = p<sub>i,j</sub>；每行和 =1</td></tr>
+</table>
+<div class="cite">引用：LN2 p.4–5（Markov 定義）、p.12（given present，past 與 future 獨立）、p.13–15（齊次＋轉移概率＋聯合公式）、p.16（本題原圖＋例題）、p.17–18（C–K＋P<sup>(s)</sup>=P<sup>s</sup>）。</div>
+<h4>1 · 由零起步：咩係 Markov？</h4>
+<p>想像你企喺格 1、2 或 3。下一步去邊，<b>只睇你而家企邊格</b>，唔理你之前行過咩路。數學寫法就係 <code class="k">P(X<sub>t+1</sub>=j | X<sub>t</sub>,…,X<sub>0</sub>) = P(X<sub>t+1</sub>=j | X<sub>t</sub>)</code>。本題個圖已經話晒俾你聽呢個規律：由 1 出發，下一步 1/2/3 的概率分別 0.4/0.5/0.1，無論你之前點嚟。</p>
+<p>因為規律唔隨時間變，我哋叫佢 <b>time-homogeneous（時間齊次）</b>，所以可以用同一個矩陣 P 代表每一步。</p>
+<h4>2 · 點由圖讀出 P？</h4>
+<p>逐行讀：由 1 的三支箭 0.4（返1）、0.5（去2）、0.1（去3），所以第 1 行 = [0.4,0.5,0.1]。同理第 2 行 [0.3,0.3,0.4]，第 3 行 [0.3,0.2,0.5]。檢查：每行和 =1（下一格必定係 1/2/3 之一）。</p>
+<h4>3 · (a) 兩步：點解要「分三條路加埋」？</h4>
+<p>問 <code class="k">P(X<sub>2</sub>=2 | X<sub>0</sub>=1)</code>。中間 X<sub>1</sub> 可以係 1、2 或 3（全概率／total probability，見 LN1 p.16）。所以：</p>
+<p><code class="k">P(X<sub>2</sub>=2|X<sub>0</sub>=1) = Σ<sub>k</sub> P(X<sub>1</sub>=k|X<sub>0</sub>=1)·P(X<sub>2</sub>=2|X<sub>1</sub>=k) = Σ<sub>k</sub> p<sub>1k</sub>p<sub>k2</sub></code></p>
+<p>三條路：1→1→2：0.4×0.5=0.20；1→2→2：0.5×0.3=0.15；1→3→2：0.1×0.2=0.02。加埋 = <b>0.37</b>。呢個就係 Chapman–Kolmogorov：兩步矩陣 = P×P，答案即 (P<sup>2</sup>)<sub>12</sub>。你可以用頁面上的計算機轉起點／終點驗證。</p>
+<h4>4 · (b) 聯合同時發生：點解要連乘？</h4>
+<p>問四個時刻同時等於 2,3,1,2。根據條件概率鏈式＋Markov（LN2 p.15）：<code class="k">P(X<sub>0</sub>=2,X<sub>1</sub>=3,X<sub>2</sub>=1,X<sub>3</sub>=2) = P(X<sub>0</sub>=2)·p<sub>23</sub>·p<sub>31</sub>·p<sub>12</sub></code>。代入 0.5×0.4×0.3×0.5 = <b>0.03</b>。留意：第一個因子係題目俾的初始分布，後面三個係圖上的箭頭。</p>
+<h4>5 · 常見錯誤</h4>
+<p>① 誤將 P(X<sub>2</sub>|X<sub>0</sub>) 當 p<sub>12</sub>（0.5）——漏咗中間一步。② 聯合概率漏乘 P(X<sub>0</sub>)。③ 行列調轉（p<sub>i,j</sub> 係「由 i 去 j」，唔係倒轉）。</p>
+<details class="quiz"><summary>自我小測：P(X<sub>2</sub>=3|X<sub>0</sub>=1) = ?（撳開睇答案）</summary><p>0.4×0.1+0.5×0.4+0.1×0.5 = 0.04+0.20+0.05 = <b>0.29</b>。即 P<sup>2</sup> 第一行第三列。</p></details>
+</div>
+</template>
 <h3>互動：兩步轉移計算機</h3>
 <div class="controls">
 <label>起點 X₀ <select id="q1s"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></label>
@@ -177,6 +223,34 @@ q1path();
 
 <div class="step"><b>(b) BB 兩年內違約：</b>違約係吸收態，所以「兩年內違約」= 第一年已違約 ＋ 第一年去咗第個評級、第二年再違約。用 Chapman–Kolmogorov：<code class="k">P = p(BB→D) + Σₖ p(BB→k)·p(k→D) = (P²)_{BB,D}</code>。最大貢獻係直接違約 (0.006169) 同經 BB→BB→D (0.005362)、BB→B→D (0.002303) 等，總和 <b>0.015601（1.5601%）</b>。</div>
 <div class="ans">答案 (b)：<b>0.015601 ≈ 1.5601%</b></div>
+<div class="controls tut-btn"><button class="btn" onclick="openTut('q2')">📖 由零開始學：放大＋詳細教學（Q2）</button></div>
+<template id="tut-q2">
+<div class="tutorial">
+<p><b>適合對象：</b>由條件概率（conditional probability）講起，教你點樣將「撤回評級 NR」條件走，再計多步違約。</p>
+<h4>0 · 中英詞彙</h4>
+<table class="vocab"><tr><th>中文</th><th>English</th><th>一句話</th></tr>
+<tr><td>條件概率</td><td>conditional probability P(A|B)</td><td>P(A∩B)/P(B)（LN1, p.16）</td></tr>
+<tr><td>全概率</td><td>law of total probability</td><td>分情況加總（LN1, p.16,21）</td></tr>
+<tr><td>經驗概率</td><td>empirical probability</td><td>由歷史頻率估計的 p<sub>i,j</sub></td></tr>
+<tr><td>條件化／重整</td><td>condition / re-normalize</td><td>已知仍有評級下，p̃<sub>i,j</sub>=p<sub>i,j</sub>/(1−p<sub>i,NR</sub>)</td></tr>
+<tr><td>吸收態</td><td>absorbing state</td><td>入咗就唔走：p<sub>D,D</sub>=1（LN3 互通類概念）</td></tr>
+<tr><td>多步轉移</td><td>s-step transition P<sup>s</sup></td><td>(P<sup>s</sup>)<sub>i,j</sub>=P(X<sub>s</sub>=j|X<sub>0</sub>=i)（LN2, p.15,17–18）</td></tr>
+<tr><td>分布傳播</td><td>state distribution π<sub>t</sub><sup>T</sup>=π<sub>t−1</sub><sup>T</sup>P</td><td>LN2, p.19</td></tr>
+</table>
+<div class="cite">引用：LN1 p.16（條件＋全概率）、LN2 p.15（聯合＝初分布×連乘）、p.17–19（C–K＋P<sup>s</sup>＋分布傳播）。吸收態思想見 LN3 p.2–3（可達／互通）與 p.13（停時後再生）。</div>
+<h4>1 · (a) 點解要除以 (100−NR)？</h4>
+<p>原表每行係「年初某評級 → 年尾評級（含 NR）」的百分比。題目叫我哋 <b>condition on 仍然有評級</b>，即已知事件 B={唔係 NR}。根據條件概率，新的概率 = 舊概率／P(B)。P(B) = (100−NR)/100。所以例如 AAA 行：分母 =100−3.08=96.92，AAA→AAA =87.28/96.92=<b>0.900537</b>，AAA→AA =8.92/96.92=0.092035，如此類推。每行新的和 =1。D 欄本身已經係條件化後的值（如 BB→D =0.56/90.77=0.006169）。</p>
+<h4>2 · 點解 D 要當吸收態？</h4>
+<p>違約係終點：違約咗唔會再有評級。所以計「兩年內」必須設 p<sub>D,D</sub>=1，否則第二年由 D 出發無定義。咁樣 (P<sup>2</sup>)<sub>BB,D</sub> 就自動等於「第一年已違約＋第一年去別處、第二年違約」。</p>
+<h4>3 · (b) BB 兩年內違約：逐步加總</h4>
+<p>公式：<code class="k">P = p<sub>BB,D</sub> + Σ<sub>k≠D</sub> p<sub>BB,k</sub>·p<sub>k,D</sub></code>。數字：直接 0.006169；經 BB→BB→D：0.869120×0.006169≈0.005362；經 B：0.068855×0.033451≈0.002303；經 CCC/C：0.005508×0.307403≈0.001693；經 BBB：0.048915×0.001485≈0.000073；其餘極細。加埋 = <b>0.015601（1.5601%）</b>。頁面長條圖就係每項貢獻。</p>
+<h4>4 · (c) AAA 三年後仍 AA 或以上</h4>
+<p>即由 AAA 出發，三年後分布 π<sub>3</sub><sup>T</sup> = e<sub>AAA</sub><sup>T</sup>P<sup>3</sup> 中 AAA＋AA 兩格之和。計到 P<sup>3</sup> 第一行：AAA≈73.148%、AA≈22.697%，和 = <b>0.958450（95.845%）</b>。「一直留喺 AA+」的路徑和是 0.958109，只差 0.00034——因為中途大跌再大升極罕見。考試寫 0.95845 即可，頁面按鈕可展開成個三年分布驗證。</p>
+<h4>5 · 常見錯誤</h4>
+<p>① 唔記得重整，直接用 0.56% 當一年違約（正確係 0.6169%）。② 兩年違約只計 p<sup>2</sup> 唔加第一年（其實吸收設定已包）。③ 百分比／小數混亂（記得除 100）。</p>
+<details class="quiz"><summary>自我小測：BB 一年違約概率係幾多？（撳開）</summary><p>0.56/(100−9.23)=0.56/90.77=<b>0.006169（0.6169%）</b>。</p></details>
+</div>
+</template>
 <div id="q2b"></div>
 <script>
 const P2f=[[0.900537,0.092035,0.005262,0.000310,0.001032,0.000310,0.000516,0],[0.004674,0.911300,0.077898,0.004570,0.000519,0.000623,0.000208,0.000208],[0.000208,0.015425,0.931944,0.048359,0.002397,0.001042,0.000104,0.000521],[0,0.000742,0.032347,0.926185,0.034044,0.004242,0.000955,0.001485],[0.000110,0.000220,0.001102,0.048915,0.869120,0.068855,0.005508,0.006169],[0,0.000228,0.000685,0.001598,0.051033,0.858317,0.054687,0.033451],[0,0,0.000824,0.001530,0.004708,0.155114,0.530423,0.307403],[0,0,0,0,0,0,0,1]];
@@ -207,6 +281,29 @@ h+=`<p>AAA+AA = ${(P3[0][0]+P3[0][1]).toFixed(6)} ≈ 95.845%</p>`;document.getE
 <div class="ans">(b) <b>否（No）。0、N 吸收，唔同其他狀態互通。</b></div>
 <div class="step"><b>(c) 平穩分布？</b>有限狀態鏈必存在平穩分布；但因為唔 irreducible，唔唯一。例如 δ₀（永遠停喺 0）同 δ<sub>N</sub> 都係平穩，佢哋嘅凸組合都係。</div>
 <div class="ans">(c) <b>存在，但不唯一（Exists but not unique）。</b></div>
+<div class="controls tut-btn"><button class="btn" onclick="openTut('q3')">📖 由零開始學：放大＋詳細教學（Q3）</button></div>
+<template id="tut-q3">
+<div class="tutorial">
+<p><b>適合對象：</b>由 simple random walk（簡單隨機漫步）講起，手把手證 Markov，再講 irreducible（不可約）同 stationary（平穩）存在唯一。</p>
+<h4>0 · 中英詞彙</h4>
+<table class="vocab"><tr><th>中文</th><th>English</th><th>一句話</th></tr>
+<tr><td>獨立增量</td><td>independent increments ξ<sub>t</sub></td><td>每局 +1/−1，獨立同分布（LN2, p.6）</td></tr>
+<tr><td>可達／互通</td><td>accessible / communicate ↔</td><td>有正概率路徑；互相可達叫互通（LN3, p.2）</td></tr>
+<tr><td>互通類／不可約</td><td>communicating class / irreducible</td><td>得一個類叫不可約（LN3, p.3）</td></tr>
+<tr><td>吸收態</td><td>absorbing state</td><td>p<sub>i,i</sub>=1，出唔到去</td></tr>
+<tr><td>平穩分布</td><td>stationary distribution π<sup>T</sup>=π<sup>T</sup>P</td><td>入咗就唔變（LN2, p.20；LN3, p.12）</td></tr>
+<tr><td>有限鏈定理</td><td>finite Markov chain theorem</td><td>有限必存在；不可約則唯一；不可約＋非週期則收斂（LN3, p.7）</td></tr>
+</table>
+<div class="cite">引用：LN2 p.6–7（simple random walk 的 Markov 證明，本題照抄）、LN3 p.2–3（可達／互通／不可約）、p.7（有限鏈定理）、p.20–24（回歸／頻率 1/E[T]，有限不可約必正回歸）。</div>
+<h4>1 · (a) 點證係 Markov？（照 LN2 p.7 抄）</h4>
+<p>設 X<sub>n</sub> 為 n 局後資金，ξ<sub>n+1</sub> 為下一局結果（+1 概率 p，−1 概率 1−p），各局獨立。未吸收時 X<sub>n+1</sub>=X<sub>n</sub>+ξ<sub>n+1</sub>；已吸收（0/N）則留喺度。因為 ξ<sub>n+1</sub> <b>獨立於</b> X<sub>0</sub>…X<sub>n</sub>（LN2 p.7 第二個等號的理由），所以 <code class="k">P(X<sub>n+1</sub>=j|歷史)=φ(j−X<sub>n</sub>)=P(X<sub>n+1</sub>=j|X<sub>n</sub>)</code>，其中 φ 是 ξ 的分布（吸收態單獨處理）。只依賴 X<sub>n</sub> → Markov。又因 ξ 同分布，轉移唔隨 n 變 → time-homogeneous。狀態空間 {0,…,N}，矩陣如答案：<b>0/N 行係 [1,0…]，中間行得兩個非零：右 p、左 1−p</b>。</p>
+<h4>2 · (b) 點解唔 irreducible？</h4>
+<p>Irreducible 要求<b>任意兩態互通</b>。但 0 係吸收：由 1 可以經連輸去 0（概率 (1−p)<sup>n</sup>&gt;0，可達），但由 0 去 1 的概率永遠 0（唔可達），所以 0↮1。至少有 {0}、{N}、{1..N−1} 三個類 → <b>No</b>。就算 p=0 或 1，吸收性不變，依然唔可約。</p>
+<h4>3 · (c) 平穩存在？唯一？</h4>
+<p>存在：有限狀態鏈必有至少一個平穩（LN3 p.7(i)＋p.24 有限必有回歸態）。唔唯一：δ<sub>0</sub>（全質量喺 0）滿足 δ<sub>0</sub><sup>T</sup>P=δ<sub>0</sub><sup>T</sup>，δ<sub>N</sub> 亦然，佢哋嘅凸組合 αδ<sub>0</sub>+(1−α)δ<sub>N</sub> 都係。所以答案係 <b>Exists but not unique</b>。唯一性需要 irreducible（LN3 p.7(ii)），本題唔符合。</p>
+<details class="quiz"><summary>自我小測：若 N=2，寫出 3×3 矩陣（撳開）</summary><p>行0：[1,0,0]；行1：[1−p,p?不對，1→0係1−p，1→2係p] 即 [1−p,0,p]；行2：[0,0,1]。注意中間 1→1 係 0。</p></details>
+</div>
+</template>
 <h3>互動：賭徒破產模擬</h3>
 <div class="controls">
 <label>p <input id="q3p" type="range" min="0.05" max="0.95" step="0.05" value="0.5" oninput="document.getElementById('q3pv').textContent=this.value"> <span id="q3pv">0.5</span></label>
@@ -238,6 +335,29 @@ q3sim();
 <h2>Q4 · (s,S) 訂貨政策 <span class="badge">存貨 Markov 鏈</span></h2>
 <div class="step"><b>直觀：</b>Xₙ 係第 n 期<i>期末</i>存貨。 bekannten 期初存貨 Xₙ₋₁ 後，補貨規則係確定性函數：<code class="k">Yₙ = Xₙ₋₁（若 ≥s），Yₙ = S（若 &lt;s）</code>；再減去當期獨立需求 Dₙ（缺貨即棄：<code class="k">Xₙ = max(Yₙ−Dₙ, 0)</code>）。因為 Dₙ i.i.d. 且獨立於歷史，Xₙ 在已知 Xₙ₋₁ 下嘅分布唔再依賴更早歷史 → Markov。狀態空間 <code class="k">{0,…,S}</code>。</div>
 <div class="ans">轉移概率（α<sub>k</sub>=P(D=k)）：<br><b>i ≥ s：</b>p<sub>i,j</sub>=α<sub>i−j</sub>（1≤j≤i），p<sub>i,0</sub>=Σ<sub>k≥i</sub>α<sub>k</sub>，j&gt;i 時 0。<br><b>i &lt; s：</b>p<sub>i,j</sub>=α<sub>S−j</sub>（1≤j≤S），p<sub>i,0</sub>=Σ<sub>k≥S</sub>α<sub>k</sub>（與 i 無關）。</div>
+<div class="controls tut-btn"><button class="btn" onclick="openTut('q4')">📖 由零開始學：放大＋詳細教學（Q4）</button></div>
+<template id="tut-q4">
+<div class="tutorial">
+<p><b>適合對象：</b>由存貨故事講起，教你點樣將「補貨規則＋獨立需求」變成 Markov，並寫出轉移公式。</p>
+<h4>0 · 中英詞彙</h4>
+<table class="vocab"><tr><th>中文</th><th>English</th><th>一句話</th></tr>
+<tr><td>期初／期末存貨</td><td>beginning / end inventory</td><td>Y<sub>n</sub> 補貨後、X<sub>n</sub> 扣需求後</td></tr>
+<tr><td>(s,S) 政策</td><td>(s,S)-policy</td><td>期初 x≥s 唔補；x&lt;s 補到 S</td></tr>
+<tr><td>需求分布</td><td>demand distribution α<sub>k</sub>=P(D=k)</td><td>每日獨立同分布（i.i.d.）</td></tr>
+<tr><td>缺貨即棄</td><td>lost sales</td><td>唔夠扣就變 0：X<sub>n</sub>=max(Y<sub>n</sub>−D<sub>n</sub>,0)</td></tr>
+<tr><td>確定性函數</td><td>deterministic function</td><td>Y<sub>n</sub> 係 X<sub>n−1</sub> 的函數，無隨機</td></tr>
+</table>
+<div class="cite">引用：LN2 p.4–5（Markov 定義）、p.7（獨立增量 ⇒ Markov 的模板證明）、p.8（Ehrenfest urn：同樣由「確定規則＋隨機抽」造 Markov）、p.13–15（齊次＋轉移）。</div>
+<h4>1 · 故事轉數學</h4>
+<p>第 n 期：上期末 X<sub>n−1</sub>=i。先補貨：若 i≥s，期初 Y<sub>n</sub>=i；若 i&lt;s，Y<sub>n</sub>=S（即時到貨）。再遇需求 D<sub>n</sub>（概率 α<sub>k</sub>，獨立於一切歷史），期末 <code class="k">X<sub>n</sub>=max(Y<sub>n</sub>−D<sub>n</sub>,0)</code>。因為 D<sub>n</sub> 獨立於過去，已知 X<sub>n−1</sub>=i 就知 Y<sub>n</sub>，X<sub>n</sub> 的分布只由 D<sub>n</sub> 決定 → <b>只依賴 i，唔依賴更早</b> → Markov。需求同分布 → 齊次。狀態最多 S（補到 S 再扣唔會多過 S），最少 0，所以空間 {0,…,S}。</p>
+<h4>2 · 轉移公式點嚟？分兩種 i</h4>
+<p><b>情況 A：i≥s（唔補，Y=i）。</b>要期末 =j≥1，必須需求 =i−j，概率 α<sub>i−j</sub>。要期末 =0，必須需求 ≥i（全部清零），概率 Σ<sub>k≥i</sub>α<sub>k</sub>（tail sum）。j&gt;i 不可能（存貨唔會自己生），概率 0。</p>
+<p><b>情況 B：i&lt;s（補到 S，Y=S）。</b>同上但起點換 S：j≥1 時 α<sub>S−j</sub>，0 時 Σ<sub>k≥S</sub>α<sub>k</sub>。<b>重點：與 i 無關</b>——頭 s 行完全一樣，因為都係由 S 出發。</p>
+<h4>3 · 例子＋模擬對照</h4>
+<p>設 s=3,S=8。若上期末 2（&lt;s）→ 期初補到 8；若當日需求 5 → 期末 3。頁面模擬條橙虛線就係 s，藍線一跌穿 s 下期即彈返 S。你可以改 λ（平均需求）睇補貨頻率。</p>
+<details class="quiz"><summary>自我小測：i=5≥s，P(X<sub>n</sub>=4|X<sub>n−1</sub>=5)=?（撳開）</summary><p>需求 =5−4=1，所以 = <b>α<sub>1</sub></b>。同理 P(=0)=Σ<sub>k≥5</sub>α<sub>k</sub>。</p></details>
+</div>
+</template>
 <h3>互動：(s,S) 存貨模擬</h3>
 <div class="controls">
 <label>s <input id="q4s" type="number" value="3" min="1" max="9" style="width:55px"></label>
@@ -295,6 +415,29 @@ q4sim();
 </g>
 <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#333" stroke-width="1.2"/></marker></defs>
 </svg>
+<div class="controls tut-btn"><button class="btn" onclick="openTut('q5')">📖 由零開始學：放大＋詳細教學（Q5）</button></div>
+<template id="tut-q5">
+<div class="tutorial">
+<p><b>適合對象：</b>由 PageRank 故事講起：點解「重要性」= 平穩分布，點由圖數出度，點解 teleport 保證唯一收斂。</p>
+<h4>0 · 中英詞彙</h4>
+<table class="vocab"><tr><th>中文</th><th>English</th><th>一句話</th></tr>
+<tr><td>有向圖／出度</td><td>directed graph / out-degree</td><td>每個節點射出幾多箭（LN2, p.9）</td></tr>
+<tr><td>隨機衝浪者</td><td>random surfer X<sub>t</sub></td><td>t 時刻睇緊邊頁（LN2, p.10）</td></tr>
+<tr><td>阻尼／隨機跳</td><td>damping / teleport (1−α)</td><td>本題 α=0.8 跟連結，0.2 隨機跳（LN2, p.9–10）</td></tr>
+<tr><td>平穩＝重要性</td><td>stationary = PageRank</td><td>長期瀏覽概率（LN2, p.10）</td></tr>
+<tr><td>非週期</td><td>aperiodic (period 1)</td><td>若 p<sub>i,i</sub>&gt;0 則週期 1（LN3, p.6）</td></tr>
+<tr><td>冪迭代</td><td>power iteration π<sub>t+1</sub><sup>T</sup>=π<sub>t</sub><sup>T</sup>P</td><td>LN2, p.19；誤差指數衰減（LN3, p.8–11）</td></tr>
+</table>
+<div class="cite">引用：LN2 p.9–11（PageRank 公式＋例）、p.19–20（分布傳播＋平穩定義）、LN3 p.6（週期）、p.7（有限不可約⇒唯一＋收斂）、p.8–12（收斂速度＋解線性方程）。</div>
+<h4>1 · 公式點嚟？</h4>
+<p>LN2 p.10 公式：若 y 有連自 X<sub>t</sub>，P = α·1/outdeg + (1−α)·1/N；否則 (1−α)·1/N。本題 N=5，α=0.8，所以 teleport 每格 0.04，有連結再加 0.8/outdeg。數出度：1→{3,5}(2)、2→{1,3}(2)、3→{2,4}(2)、4→{1,5}(2)、5→{3}(1)。於是第1行去3/5各 0.4+0.04=<b>0.44</b>，其餘 0.04；第5行去3係 0.8+0.04=<b>0.84</b>。每行和 =1。</p>
+<h4>2 · 點解一定有唯一平穩＋會收斂？</h4>
+<p>因為 teleport 令 <b>所有元素 &gt;0</b>（最小 0.04），任兩頁一步可達 → irreducible；且 p<sub>i,i</sub>&gt;0 → 每態週期 1 → aperiodic（LN3 p.6）。有限＋不可約 ⇒ 存在唯一平穩（LN3 p.7(ii)）；再加非週期 ⇒ 任初分布都收斂（p.7(iii)），誤差指數衰減（p.8–11）。所以由均勻 [0.2…] 出發迭代 15 步，必去到答案。</p>
+<h4>3 · 點計到答案？</h4>
+<p>解聯立 <code class="k">π<sup>T</sup>=π<sup>T</sup>P, Σπ=1</code>（LN3 p.12），或做 power iteration（頁面動畫）。結果 <b>(0.173422,0.166777,0.316944,0.166777,0.176080)</b>。第3最高：1、2、5 都指住佢。2 同 4 對稱（入／出結構鏡像）所以相等——可用來驗算。</p>
+<details class="quiz"><summary>自我小測：若無 teleport（α=1），第5行係咩？會有咩問題？（撳開）</summary><p>第5行去3=1，其餘 0。矩陣出現 0，可能唔再不可約／非週期，唯一收斂唔保證。這就是要 teleport 的原因。</p></details>
+</div>
+</template>
 <h3>互動：Power iteration 收斂</h3>
 <div class="controls"><button class="btn" onclick="q5run()">由均勻分布開始迭代 15 步</button><button class="btn ghost" onclick="q5reset()">重設</button></div>
 <div id="q5bars"></div>
@@ -315,6 +458,29 @@ draw5();
 <div class="step"><b>Irreducible 點嚟？</b>圖連通 ⇒ 任兩點 x,y 之間有條路 x=v₀→v₁→…→vₙ=y，每步都係鄰居所以一步概率 &gt;0（權重係正數），成條路概率 = 連乘 &gt;0，所以 y 由 x 可達；無向圖反向亦然 ⇒ 任意兩態互通 ⇒ irreducible（得一個互通類）。</div>
 <div class="step"><b>平穩分布點估？</b>直覺：長期停留喺某點嘅時間正比於「加權度」<code class="k">w(x)=Σ_{z∈N(x)} w({x,z})</code>。設 <code class="k">W=Σₓ w(x)</code>，<code class="k">πₓ = w(x)/W</code>。驗證 detailed balance：<code class="k">πₓpₓᵧ = w(x)/W · w({x,y})/w(x) = w({x,y})/W = πᵧpᵧₓ</code>，兩邊對 x 求和即得 πᵀ=πᵀP。若 V 有限，W 有限，π 係合法分布；若無限，就係不變測度。</div>
 <div class="ans">答案：<b>Irreducible（Yes）。π<sub>x</sub> = w(x)/W，其中 w(x)=Σ<sub>z∈N(x)</sub>w({x,z})，W=Σ<sub>v</sub>w(v)。</b></div>
+<div class="controls tut-btn"><button class="btn" onclick="openTut('q6')">📖 由零開始學：放大＋詳細教學（Q6）</button></div>
+<template id="tut-q6">
+<div class="tutorial">
+<p><b>適合對象：</b>由無向圖講起，教你點證 irreducible，再點「估到」平穩係加權度比例，並用 detailed balance 驗證。</p>
+<h4>0 · 中英詞彙</h4>
+<table class="vocab"><tr><th>中文</th><th>English</th><th>一句話</th></tr>
+<tr><td>無向圖／鄰居</td><td>undirected graph / neighbor N<sub>G</sub>(x)</td><td>邊無方向；有邊相連叫鄰居</td></tr>
+<tr><td>權重／加權度</td><td>weight w / weighted degree w(x)=Σw({x,z})</td><td>w&gt;0；w(x) 係總出發能力</td></tr>
+<tr><td>連通</td><td>connected</td><td>任兩點有路相連（題設）</td></tr>
+<tr><td>細緻平衡</td><td>detailed balance π<sub>x</sub>p<sub>x,y</sub>=π<sub>y</sub>p<sub>y,x</sub></td><td>逐對平衡 ⇒ 整體平穩，較強條件</td></tr>
+<tr><td>不變測度／分布</td><td>invariant measure / distribution</td><td>有限 W 先可歸一成分布；否則係測度</td></tr>
+<tr><td>正回歸</td><td>positive recurrent</td><td>有限不可約必正回歸（LN3, p.24），頻率 =1/E[T]（p.22）</td></tr>
+</table>
+<div class="cite">引用：LN3 p.2–3（可達／互通／不可約）、p.7（有限不可約⇒唯一平穩）、p.21–24（正／零回歸、頻率定理、有限必正回歸）。Detailed balance 是驗證 π<sup>T</sup>=π<sup>T</sup>P 的捷徑。</div>
+<h4>1 · 點證 irreducible？（三句）</h4>
+<p>任取 x,y。連通 ⇒ 有路 x=v<sub>0</sub>→v<sub>1</sub>→…→v<sub>n</sub>=y，每段係鄰居所以一步概率 w({v<sub>t</sub>,v<sub>t+1</sub>})/w(v<sub>t</sub>) &gt;0（權重正數）。成條路概率 = 連乘 &gt;0，所以 y 由 x 可達（p<sup>(n)</sup><sub>x,y</sub>&gt;0）。無向圖反向亦係路，所以 x 由 y 可達 → 互通。任意兩點互通 → <b>得一個類 → irreducible</b>。</p>
+<h4>2 · 點估到 π<sub>x</sub>=w(x)/W？</h4>
+<p>直覺：出發能力越大，長期逗留越耐。設 W=Σ<sub>v</sub>w(v)（有限圖 W=2Σ<sub>e</sub>w(e)）。猜 <code class="k">π<sub>x</sub>=w(x)/W</code>。驗證 detailed balance：<code class="k">π<sub>x</sub>p<sub>x,y</sub> = w(x)/W · w({x,y})/w(x) = w({x,y})/W</code>，右邊對稱，x↔y 一樣，所以 =π<sub>y</sub>p<sub>y,x</sub>。將等式對 x 求和：Σ<sub>x</sub>π<sub>x</sub>p<sub>x,y</sub>=π<sub>y</sub>Σ<sub>x</sub>p<sub>y,x</sub>=π<sub>y</sub>（因為由 y 出發和 =1），即 π<sup>T</sup>=π<sup>T</sup>P。有限＋不可約 ⇒ 呢個就係<b>唯一</b>平穩（LN3 p.7）。若 V 無限，W 可能無限，同一條式俾的是不變測度，要另加可歸一條件先係分布——題目叫分布，即默認有限或 W 有限。</p>
+<h4>3 · 例子</h4>
+<p>三角形 1-2-3 權 a,b,c：w<sub>1</sub>=a+c，w<sub>2</sub>=a+b，w<sub>3</sub>=b+c，W=2(a+b+c)，π<sub>1</sub>=(a+c)/W 等。頁面滑桿可即時驗 πP=π。特例：無權（全 1）時 π<sub>x</sub>=deg(x)/2|E|。</p>
+<details class="quiz"><summary>自我小測：正方形 4 點環，無權，每點 π 係幾多？（撳開）</summary><p>每點度 2，總 8，所以每點 <b>2/8=1/4</b>（均勻）。因為對稱，梗係均勻。</p></details>
+</div>
+</template>
 <h3>互動：加權度 ∝ 平穩概率</h3>
 <div class="controls">
 <label>w12 <input id="w12" type="range" min="1" max="9" value="2" oninput="q6up()"></label>
@@ -342,12 +508,39 @@ q6up();
 </section>
 
 </main>
+
+<div class="modal" id="tutModal" onclick="if(event.target===this)closeTut()">
+<div class="modal-box">
+<div class="modal-bar">
+<b id="tutTitle">詳細教學</b>
+<button class="btn" onclick="closeTut()">✕ 關閉／返回</button>
+</div>
+<div class="modal-body" id="tutBody"></div>
+</div>
+</div>
+
 <footer>SEEM4760 Homework 1 · 互動解題網站（繁體中文）· 數值已用程式覆核（P²、P³、冪迭代）</footer>
 <script>
 document.querySelectorAll('#topnav button').forEach(b=>b.addEventListener('click',()=>{
  document.querySelectorAll('#topnav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
  document.getElementById(b.dataset.q).scrollIntoView({behavior:'smooth'});
 }));
+</script>
+<script>
+
+function openTut(q){
+ const src=document.getElementById('tut-'+q);
+ if(!src)return;
+ const titles={q1:'Q1 詳細教學：由零開始學 Markov 轉移',q2:'Q2 詳細教學：條件化與多步轉移',q3:'Q3 詳細教學：賭徒破產的 Markov 性與不可約',q4:'Q4 詳細教學：(s,S) 存貨為何是 Markov',q5:'Q5 詳細教學：PageRank 的轉移與平穩',q6:'Q6 詳細教學：無向圖隨機漫步與 detailed balance'};
+ document.getElementById('tutTitle').textContent=titles[q]||'詳細教學';
+ document.getElementById('tutBody').innerHTML=src.innerHTML;
+ document.getElementById('tutModal').classList.add('open');
+ document.body.style.overflow='hidden';
+ document.getElementById('tutModal').scrollTop=0;
+}
+function closeTut(){document.getElementById('tutModal').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTut();});
+
 </script>
 </body>
 </html>
